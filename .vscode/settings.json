@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "config.h": "c",
+    "dialtone.h": "c",
+    "chrono": "c",
+    "algorithm": "c",
+    "pbx.h": "c",
+    "arduino.h": "c"
+  }
+}
