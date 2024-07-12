@@ -22,21 +22,23 @@ void transmit_caller_id(const char *number)
 
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
 
+    bell202_begin();
     char preamble[32];
-    memset(preamble, 0x55, 32);
-    bell202_send(preamble, 32, false);
-    bell202_tone(1, 150);
+    memset(preamble, 0x55, sizeof(preamble));
+    bell202_send(preamble, 30, false);
+    bell202_tone(1, 140);
     bell202_send(txbuf, checksum_position + 1, true);
+    bell202_stop();
 
     // modem.sendTone();
     // modem.write((uint8_t *)txbuf, strlen(txbuf));
-    // Serial.print("Transmitting Caller ID: ");
-    // for (int i = 0; i < checksum_position + 1; i++)
-    // {
-    //     Serial.print(txbuf[i], HEX);
-    //     Serial.print(" ");
-    // }
-    // Serial.println();
+    Serial.print("Transmitting Caller ID: ");
+    for (int i = 0; i < checksum_position + 1; i++)
+    {
+        Serial.print(txbuf[i], HEX);
+        Serial.print(" ");
+    }
+    Serial.println();
 }
 
 uint8_t modulo256(char *buffer, int len)
