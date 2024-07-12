@@ -4,6 +4,7 @@
 #include "config.h"
 #include "dialtone.h"
 #include "callerid.h"
+#include "dtmf.h"
 
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
@@ -23,7 +24,8 @@ void initialize_pbx()
   pinMode(CONNECT_RELAY, OUTPUT);
   pinMode(RINGER_RELAY, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(HOOK_PIN), caller_hook_isr, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(CALLER_HOOK_PIN), caller_hook_isr, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(DEST_HOOK_PIN), caller_hook_isr, CHANGE);
 }
 
 void handle_pbx()
@@ -33,6 +35,8 @@ void handle_pbx()
   static unsigned long last_tone_change = 0;
   static unsigned long last_ringer_change = 0;
   static long rings = 0;
+  static char called_number[32];
+  int readn = 0;
 
   if (millis() - caller_hook_last_transition > 300)
   {
@@ -55,6 +59,7 @@ void handle_pbx()
     }
     else if (caller_off_hook && !dest_off_hook)
     {
+      memset(called_number, 0, sizeof(called_number));
       state = WAIT_FOR_DIAL;
     }
     break;
@@ -73,10 +78,20 @@ void handle_pbx()
     {
       state = IDLE;
     }
-    if (millis() - last_state_change > 2000)
+    else
     {
-      state = CALLING;
+
+      readn = get_number(called_number, sizeof(called_number));
+      if (readn > 0)
+      {
+        state = CALLING;
+      }
     }
+
+    // if (millis() - last_state_change > 2000)
+    // {
+    //   state = CALLING;
+    // }
     break;
 
   case CALLING:
@@ -133,7 +148,7 @@ void handle_pbx()
     {
       if (rings == 1)
       {
-        transmit_caller_id("1234");
+        transmit_caller_id(called_number);
       }
       digitalWrite(RINGER_RELAY, !digitalRead(RINGER_RELAY));
       last_ringer_change = millis();

@@ -15,15 +15,12 @@ int count = 0;
 
 void dialtone_cb()
 {
-  if (stop_at && stop_at > millis())
-  {
-    dialtone_stop();
+  if (stop_at && stop_at < millis())
     return;
-  }
 
   while (pwm.availableForWrite())
   {
-    pwm.write(*p++ / DIALTONE_VOLUME_DIVIDER);
+    pwm.write(*p++ * 2);
     count += 2;
     if (count >= sizeof(dialtone_samples))
     {
@@ -32,10 +29,14 @@ void dialtone_cb()
     }
   }
 }
-
+bool started = false;
 void dialtone_start()
 {
-  pwm.onTransmit(dialtone_cb);
+  if (!started)
+  {
+    pwm.onTransmit(dialtone_cb);
+    started = true;
+  }
   pwm.begin(31500);
   stop_at = 0;
 }
@@ -48,5 +49,5 @@ void dialtone_start(uint16_t duration)
 
 void dialtone_stop()
 {
-  pwm.end();
+  stop_at = millis();
 }

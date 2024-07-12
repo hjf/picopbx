@@ -1,9 +1,10 @@
 #include <Arduino.h>
+#include <ADCInput.h>
+#include <Goertzel.h>
 #include "dtmf.h"
 #include "config.h"
 #include "util.h"
-#include <Goertzel.h>
-
+#include "dialtone.h"
 Goertzel X0(1209.0, SAMPLE_RATE);
 Goertzel X1(1336.0, SAMPLE_RATE);
 Goertzel X2(1477.0, SAMPLE_RATE);
@@ -11,7 +12,9 @@ Goertzel Y0(697.0, SAMPLE_RATE);
 Goertzel Y1(770.0, SAMPLE_RATE);
 Goertzel Y2(852.0, SAMPLE_RATE);
 Goertzel Y3(941.0, SAMPLE_RATE);
-
+ADCInput adc(A0);
+char get_dtmf();
+char dtmf_majority(char n);
 char dtmf_lut[] = {
     '1',
     '2',
@@ -25,24 +28,28 @@ char dtmf_lut[] = {
     '*',
     '0',
     '#',
-    'p',
-    'q',
-    'r',
-    's',
+    0,
+    0,
+    0,
+    0,
 };
 
+void dtmf_setup()
+{
+    adc.setFrequency(SAMPLE_RATE);
+    adc.setBuffers(4, 64);
+    adc.begin();
+}
 char get_dtmf()
 {
     int samples[SAMPLE_SIZE];
     float max_x = -1;
     float max_y = -1;
     int n = -1;
-    noInterrupts();
     for (int i = 0; i < SAMPLE_SIZE; i++)
     {
-        samples[i] = analogRead(A0);
+        samples[i] = adc.read();
     }
-    interrupts();
 
     // calculate standard deviation from samples:
     float sum = 0;
@@ -59,7 +66,7 @@ char get_dtmf()
     }
     float standardDeviation = sqrt(variance / SAMPLE_SIZE);
 
-    if (standardDeviation < 10)
+    if (standardDeviation < 30)
     {
         return '_';
     }
@@ -124,9 +131,34 @@ char dtmf_majority(char n)
     for (int i = 0; i < n; i++)
     {
         auto res = get_dtmf();
-        if (res > 0 && res != '_')
-            digitalWrite(LED_BUILTIN, LOW);
         dtmf[i] = res;
     }
     return findMajority(dtmf, n);
+}
+
+int get_number(char *result, size_t size)
+{
+    memset(result, 0, size);
+    int i = 0;
+    int spccnt = 30;
+    static char lastchar;
+    while (spccnt)
+    {
+        char maj = dtmf_majority(5);
+        if (!maj)
+            continue;
+        if (maj == '_')
+            spccnt--;
+        else
+        {
+            dialtone_stop();
+            if (spccnt > 0 && maj != lastchar)
+                result[i++] = maj;
+            spccnt = 30;
+        }
+        lastchar = maj;
+        if (i >= size || spccnt == 0)
+            return i;
+    }
+    return 0;
 }

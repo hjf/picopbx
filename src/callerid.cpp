@@ -5,7 +5,8 @@
 #define TX_BUF_LEN (64)
 void transmit_caller_id(const char *number)
 {
-
+    Serial.print("Transmitting Caller ID: ");
+    Serial.println(number);
     char txbuf[TX_BUF_LEN];
     memset(txbuf, 0, TX_BUF_LEN);
 
@@ -27,13 +28,13 @@ void transmit_caller_id(const char *number)
 
     // modem.sendTone();
     // modem.write((uint8_t *)txbuf, strlen(txbuf));
-    Serial.print("Transmitting Caller ID: ");
-    for (int i = 0; i < checksum_position + 1; i++)
-    {
-        Serial.print(txbuf[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
+    // Serial.print("Transmitting Caller ID: ");
+    // for (int i = 0; i < checksum_position + 1; i++)
+    // {
+    //     Serial.print(txbuf[i], HEX);
+    //     Serial.print(" ");
+    // }
+    // Serial.println();
 }
 
 uint8_t modulo256(char *buffer, int len)

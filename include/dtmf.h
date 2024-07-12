@@ -2,11 +2,12 @@
 #define DTMF_H
 
 #include <Arduino.h>
-#define ADC_MIDPOINT (512)
-#define SAMPLE_RATE (8900)
-#define SAMPLE_SIZE (50)
-#define MAG_THRESHOLD (80)
+#define ADC_MIDPOINT (2048)
+#define SAMPLE_RATE (8192)
+#define SAMPLE_SIZE (100)
+#define MAG_THRESHOLD (5000)
 
-char get_dtmf();
-char dtmf_majority(char n);
+void dtmf_setup();
+
+int get_number(char *result, size_t size);
 #endif
