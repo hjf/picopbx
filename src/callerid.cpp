@@ -23,10 +23,12 @@ void transmit_caller_id(const char *number)
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
 
     bell202_begin();
-    char preamble[32];
-    memset(preamble, 0x55, sizeof(preamble));
-    bell202_send(preamble, 30, false);
-    bell202_tone(1, 140);
+    char preamble[64];
+    memset(preamble, 0x55, 38);
+    memset(preamble + 38, 0xff, 21);
+    disable_start_stop_bits(true);
+    bell202_send(preamble, 38 + 21, false);
+    disable_start_stop_bits(false);
     bell202_send(txbuf, checksum_position + 1, true);
     bell202_stop();
 

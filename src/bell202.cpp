@@ -15,11 +15,10 @@ PWMAudio bell_pwm(BELL202_PIN);
 int message_position = 0;
 int bit_position = 0;
 int tx_length;
-bool tone_mode = false;
-bool tone_mark = false;
 
 char message[256];
 bool stop = false;
+bool no_start_stop_bits = false;
 
 void bell202_callback()
 {
@@ -27,17 +26,22 @@ void bell202_callback()
         return;
     while (bell_pwm.availableForWrite() >= FSK_SAMPLES_PER_BIT)
     {
-        if (!message_position && !tone_mode)
+        if (!message_position)
             return;
+
+        if (no_start_stop_bits && bit_position == 0)
+        {
+            bit_position++;
+        }
 
         char current_character = message[tx_length - message_position];
         char is_mark;
-        if (bit_position == 0 || (tone_mode && !tone_mark))
+        if (bit_position == 0)
         {
             // start bit
             is_mark = 0;
         }
-        else if (bit_position == 8 || (tone_mode && tone_mark))
+        else if (bit_position == 8)
         {
             // stop bit
             is_mark = 1;
@@ -50,12 +54,6 @@ void bell202_callback()
             Serial.println(current_character, HEX);
         bit_position++;
 
-        if (tone_mode)
-        {
-            bit_position = 0;
-            message_position = 0;
-        }
-
         int count = 0;
 
         const int16_t *p = is_mark ? mark_p : space_p;
@@ -66,6 +64,11 @@ void bell202_callback()
             auto sample = *p++;
             bell_pwm.write(sample);
             count += 2;
+        }
+
+        if (no_start_stop_bits && bit_position == 9)
+        {
+            bit_position++;
         }
 
         if (bit_position >= 10)
@@ -129,19 +132,8 @@ int bell202_send(const char *msg, size_t len, bool blocking)
     return 0;
 }
 
-void bell202_tone(bool mark, int duration)
+void disable_start_stop_bits(bool setting)
 {
-
     wait_for_message();
-
-    unsigned long endtime = millis() + duration;
-
-    tone_mark = mark;
-    tone_mode = true;
-
-    while (millis() < endtime)
-    {
-        yield();
-    }
-    tone_mode = false;
+    no_start_stop_bits = setting;
 }
