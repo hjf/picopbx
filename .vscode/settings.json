@@ -5,6 +5,7 @@
     "chrono": "c",
     "algorithm": "c",
     "pbx.h": "c",
-    "arduino.h": "c"
+    "arduino.h": "c",
+    "*.tcc": "cpp"
   }
 }

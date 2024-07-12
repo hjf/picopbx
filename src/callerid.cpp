@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "callerid.h"
 #include "config.h"
+#include "bell202.h"
 
 #define TX_BUF_LEN (64)
 void transmit_caller_id(const char *number)
@@ -21,10 +22,11 @@ void transmit_caller_id(const char *number)
 
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
 
-    for (int i = 0; i < 30; i++)
-    {
-        // modem.write(0x55);
-    }
+    char preamble[32];
+    memset(preamble, 0x55, 32);
+    bell202_send(preamble, 32, false);
+    bell202_tone(1, 150);
+    bell202_send(txbuf, checksum_position + 1, true);
 
     // modem.sendTone();
     // modem.write((uint8_t *)txbuf, strlen(txbuf));

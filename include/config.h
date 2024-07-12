@@ -9,5 +9,6 @@
 
 #define DIALTONE_VOLUME_DIVIDER (1)
 #define DIALTONE_PIN (16)
+#define BELL202_PIN (1)
 
 #endif
