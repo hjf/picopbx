@@ -50,8 +50,7 @@ void bell202_callback()
         {
             is_mark = (current_character >> (bit_position - 1)) & 0x01;
         }
-        if (!bit_position)
-            Serial.println(current_character, HEX);
+
         bit_position++;
 
         int count = 0;
@@ -66,12 +65,7 @@ void bell202_callback()
             count += 2;
         }
 
-        if (no_start_stop_bits && bit_position == 9)
-        {
-            bit_position++;
-        }
-
-        if (bit_position >= 10)
+        if (bit_position >= 9 || (no_start_stop_bits && bit_position == 8))
         {
             bit_position = 0;
             message_position--;

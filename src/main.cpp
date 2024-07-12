@@ -13,18 +13,22 @@ void setup()
   dtmf_setup();
   bell202_begin();
 
-  pinMode(1, INPUT_PULLUP);
+  pinMode(1, OUTPUT);
 }
 
 void loop()
 {
-  if (!digitalRead(1))
-  {
-    const char *numbertosend = "2125551212";
-    transmit_caller_id(numbertosend);
-    delay(10);
-    while (!digitalRead(1))
-      yield();
-  }
+  // if (!digitalRead(1))
+  // {
+  digitalWrite(1, HIGH);
+  const char *numbertosend = "2125551212";
+  transmit_caller_id(numbertosend);
+  digitalWrite(1, LOW);
+  delay(1);
+
+  // delay(10);
+  //   while (!digitalRead(1))
+  //     yield();
+  // }
   // handle_pbx();
 }

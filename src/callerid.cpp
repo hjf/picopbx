@@ -6,8 +6,8 @@
 #define TX_BUF_LEN (64)
 void transmit_caller_id(const char *number)
 {
-    Serial.print("Transmitting Caller ID: ");
-    Serial.println(number);
+    // Serial.print("Transmitting Caller ID: ");
+    // Serial.println(number);
     char txbuf[TX_BUF_LEN];
     memset(txbuf, 0, TX_BUF_LEN);
 
@@ -23,24 +23,24 @@ void transmit_caller_id(const char *number)
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
 
     bell202_begin();
-    char preamble[64];
-    memset(preamble, 0x55, 38);
-    memset(preamble + 38, 0xff, 21);
-    disable_start_stop_bits(true);
-    bell202_send(preamble, 38 + 21, false);
-    disable_start_stop_bits(false);
-    bell202_send(txbuf, checksum_position + 1, true);
+    char preamble[256];
+    memset(preamble, 0xff, 38);
+    memset(preamble + 39, 0xff, 22);
+    // disable_start_stop_bits(true);
+    bell202_send(preamble, 2, false);
+    // disable_start_stop_bits(false);
+    // bell202_send(txbuf, checksum_position + 1, true);
     bell202_stop();
 
     // modem.sendTone();
     // modem.write((uint8_t *)txbuf, strlen(txbuf));
-    Serial.print("Transmitting Caller ID: ");
-    for (int i = 0; i < checksum_position + 1; i++)
-    {
-        Serial.print(txbuf[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
+    // Serial.print("Transmitting Caller ID: ");
+    // for (int i = 0; i < checksum_position + 1; i++)
+    // {
+    //     Serial.print(txbuf[i], HEX);
+    //     Serial.print(" ");
+    // }
+    // Serial.println();
 }
 
 uint8_t modulo256(char *buffer, int len)
