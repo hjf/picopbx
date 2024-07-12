@@ -1,9 +1,13 @@
 #include <Arduino.h>
 #include "callerid.h"
 #include "config.h"
-#include "bell202.h"
 
 #define TX_BUF_LEN (64)
+
+void send_bytes(char *message, int length);
+inline void send_mark();
+inline void send_space();
+
 void transmit_caller_id(const char *number)
 {
     // Serial.print("Transmitting Caller ID: ");
@@ -22,15 +26,22 @@ void transmit_caller_id(const char *number)
 
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
 
-    bell202_begin();
-    char preamble[256];
-    memset(preamble, 0xff, 38);
-    memset(preamble + 39, 0xff, 22);
+    char c = 0x55;
+    for (int j = 0; j < 8; j++)
+    {
+        if (c & 0x80)
+            send_mark();
+        else
+            send_space();
+        c <<= 1;
+    }
+
+    // char preamble[256];
+    // memset(preamble, 0xff, 38);
+    // memset(preamble + 39, 0xff, 22);
     // disable_start_stop_bits(true);
-    bell202_send(preamble, 2, false);
     // disable_start_stop_bits(false);
     // bell202_send(txbuf, checksum_position + 1, true);
-    bell202_stop();
 
     // modem.sendTone();
     // modem.write((uint8_t *)txbuf, strlen(txbuf));
@@ -52,4 +63,66 @@ uint8_t modulo256(char *buffer, int len)
         checksum += buffer[i];
     }
     return (~checksum) + 1;
+}
+
+// at 1200 baud, 1 bit is 833us
+#define HALF_BIT_TIME_MARK 417
+// at 2200baud, 1 bit is 454us
+#define HALF_BIT_TIME_SPACE 227
+
+void send_bytes(char *message, int length)
+{
+    pinMode(BELL202_PIN, OUTPUT);
+    digitalWrite(BELL202_PIN, LOW);
+    delay(1);
+
+    // first the seizure command, 32 bytes of 0x55
+    for (int i = 0; i < 32 * 4; i++)
+    {
+        send_space();
+        send_mark();
+    }
+    // then the sync signal, 21 bytes of 0xff
+    for (int i = 0; i < 21 * 8; i++)
+    {
+        send_mark();
+    }
+    // finally the message:
+    for (int i = 0; i < length; i++)
+    {
+        char c = message[i];
+        // start bit
+        send_space();
+        // 8 data bits
+        for (int j = 0; j < 8; j++)
+        {
+            if (c & 0x01)
+                send_mark();
+            else
+                send_space();
+            c >>= 1;
+        }
+        // stop bit
+        send_mark();
+    }
+    // postamble
+    send_mark();
+    delay(1);
+    pinMode(BELL202_PIN, INPUT);
+}
+
+inline void send_mark()
+{
+    digitalWrite(BELL202_PIN, HIGH);
+    delayMicroseconds(HALF_BIT_TIME_MARK);
+    digitalWrite(BELL202_PIN, LOW);
+    delayMicroseconds(HALF_BIT_TIME_MARK);
+}
+
+inline void send_space()
+{
+    digitalWrite(BELL202_PIN, HIGH);
+    delayMicroseconds(HALF_BIT_TIME_SPACE);
+    digitalWrite(BELL202_PIN, LOW);
+    delayMicroseconds(HALF_BIT_TIME_SPACE);
 }

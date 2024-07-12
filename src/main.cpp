@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "pbx.h"
 #include "dtmf.h"
-#include "bell202.h"
 #include "callerid.h"
 void setup()
 {
@@ -11,8 +10,6 @@ void setup()
   Serial.println("Started");
   initialize_pbx();
   dtmf_setup();
-  bell202_begin();
-
   pinMode(1, OUTPUT);
 }
 
