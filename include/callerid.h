@@ -2,6 +2,6 @@
 #define CALLER_ID_H
 
 #include <Arduino.h>
-void transmit_caller_id(const char *number);
+int transmit_caller_id(const char *message, size_t length);
 uint8_t modulo256(char *buffer, int len);
 #endif

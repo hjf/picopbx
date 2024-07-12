@@ -35,7 +35,9 @@ void handle_pbx()
   static unsigned long last_tone_change = 0;
   static unsigned long last_ringer_change = 0;
   static long rings = 0;
-  static char called_number[32];
+  static char called_number[64] = {'0', '1', '0', '1', '0', '0', '0', '0'};
+  char *called_number_ptr = called_number + 8;
+
   int readn = 0;
 
   if (millis() - caller_hook_last_transition > 300)
@@ -81,7 +83,7 @@ void handle_pbx()
     else
     {
 
-      readn = get_number(called_number, sizeof(called_number));
+      readn = get_number(called_number_ptr, sizeof(called_number) - 8);
       if (readn > 0)
       {
         state = CALLING;
@@ -148,7 +150,7 @@ void handle_pbx()
     {
       if (rings == 1)
       {
-        transmit_caller_id(called_number);
+        transmit_caller_id(called_number, strlen(called_number));
       }
       digitalWrite(RINGER_RELAY, !digitalRead(RINGER_RELAY));
       last_ringer_change = millis();

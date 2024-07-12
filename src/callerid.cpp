@@ -8,50 +8,35 @@ void send_bytes(char *message, int length);
 inline void send_mark();
 inline void send_space();
 
-void transmit_caller_id(const char *number)
+int transmit_caller_id(const char *message, size_t length)
 {
-    // Serial.print("Transmitting Caller ID: ");
-    // Serial.println(number);
-    char txbuf[TX_BUF_LEN];
-    memset(txbuf, 0, TX_BUF_LEN);
-
-    char message[] = {0x30, 0x39, 0x33, 0x30, 0x31, 0x32, 0x32, 0x34, 0x36, 0x30, 0x39, 0x35, 0x35, 0x35, 0x31, 0x32, 0x31, 0x32, 0x00};
-    char msglen = strlen(message);
-
-    txbuf[0] = 0x04; // message type
-    txbuf[1] = msglen;
-
-    memcpy(txbuf + 2, message, msglen);
-    int checksum_position = msglen + 2;
-
-    txbuf[checksum_position] = modulo256(txbuf, checksum_position);
-
-    char c = 0x55;
-    for (int j = 0; j < 8; j++)
+    Serial.print("Transmitting Caller ID: ");
+    if (length > TX_BUF_LEN - 2)
     {
-        if (c & 0x80)
-            send_mark();
-        else
-            send_space();
-        c <<= 1;
+        Serial.println("ERROR Message too long");
+        return -1;
     }
 
-    // char preamble[256];
-    // memset(preamble, 0xff, 38);
-    // memset(preamble + 39, 0xff, 22);
-    // disable_start_stop_bits(true);
-    // disable_start_stop_bits(false);
-    // bell202_send(txbuf, checksum_position + 1, true);
+    pinMode(BELL202_PIN, OUTPUT);
+    digitalWrite(BELL202_PIN, LOW);
+    Serial.println(message);
+    char txbuf[TX_BUF_LEN];
+    memset(txbuf, 0, TX_BUF_LEN);
+    memcpy(txbuf + 2, message, length);
 
-    // modem.sendTone();
-    // modem.write((uint8_t *)txbuf, strlen(txbuf));
-    // Serial.print("Transmitting Caller ID: ");
-    // for (int i = 0; i < checksum_position + 1; i++)
-    // {
-    //     Serial.print(txbuf[i], HEX);
-    //     Serial.print(" ");
-    // }
-    // Serial.println();
+    txbuf[0] = 0x04; // message type
+    txbuf[1] = length;
+
+    memcpy(txbuf + 2, message, length);
+    int checksum_position = length + 2;
+
+    txbuf[checksum_position] = modulo256(txbuf, checksum_position);
+    delay(1);
+    send_bytes(txbuf, checksum_position + 1);
+    delay(1);
+
+    pinMode(BELL202_PIN, INPUT);
+    return 0;
 }
 
 uint8_t modulo256(char *buffer, int len)
@@ -65,16 +50,8 @@ uint8_t modulo256(char *buffer, int len)
     return (~checksum) + 1;
 }
 
-// at 1200 baud, 1 bit is 833us
-#define HALF_BIT_TIME_MARK 417
-// at 2200baud, 1 bit is 454us
-#define HALF_BIT_TIME_SPACE 227
-
 void send_bytes(char *message, int length)
 {
-    pinMode(BELL202_PIN, OUTPUT);
-    digitalWrite(BELL202_PIN, LOW);
-    delay(1);
 
     // first the seizure command, 32 bytes of 0x55
     for (int i = 0; i < 32 * 4; i++)
@@ -107,9 +84,12 @@ void send_bytes(char *message, int length)
     }
     // postamble
     send_mark();
-    delay(1);
-    pinMode(BELL202_PIN, INPUT);
 }
+
+// at 1200 baud, 1 bit is 833us
+#define HALF_BIT_TIME_MARK 417
+// at 2200baud, 1 bit is 454us
+#define HALF_BIT_TIME_SPACE 227
 
 inline void send_mark()
 {
@@ -125,4 +105,8 @@ inline void send_space()
     delayMicroseconds(HALF_BIT_TIME_SPACE);
     digitalWrite(BELL202_PIN, LOW);
     delayMicroseconds(HALF_BIT_TIME_SPACE);
+    digitalWrite(BELL202_PIN, HIGH);
+    delayMicroseconds(HALF_BIT_TIME_SPACE);
+    digitalWrite(BELL202_PIN, LOW);
+    delayMicroseconds(152);
 }

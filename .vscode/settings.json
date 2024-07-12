@@ -6,6 +6,7 @@
     "algorithm": "c",
     "pbx.h": "c",
     "arduino.h": "c",
-    "*.tcc": "cpp"
+    "*.tcc": "cpp",
+    "system_error": "cpp"
   }
 }
