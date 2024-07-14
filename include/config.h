@@ -11,4 +11,9 @@
 #define DIALTONE_PIN (16)
 #define BELL202_PIN (18)
 
+#define RINGER_Q1 (6)
+#define RINGER_Q2 (7)
+#define RINGER_Q3 (8)
+#define RINGER_Q4 (9)
+
 #endif
