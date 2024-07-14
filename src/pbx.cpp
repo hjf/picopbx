@@ -5,6 +5,9 @@
 #include "dialtone.h"
 #include "callerid.h"
 #include "dtmf.h"
+#include "ringer.h"
+
+Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_Q4, RINGER_RELAY, RINGER_FREQUENCY);
 
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
@@ -22,7 +25,6 @@ void initialize_pbx()
   pinMode(CALLER_HOOK_PIN, INPUT_PULLUP);
   pinMode(DEST_HOOK_PIN, INPUT_PULLUP);
   pinMode(CONNECT_RELAY, OUTPUT);
-  pinMode(RINGER_RELAY, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(CALLER_HOOK_PIN), caller_hook_isr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(DEST_HOOK_PIN), caller_hook_isr, CHANGE);
@@ -33,12 +35,12 @@ void handle_pbx()
   static State last_state = UNINITIALIZED;
   static unsigned long last_state_change = 0;
   static unsigned long last_tone_change = 0;
-  static unsigned long last_ringer_change = 0;
   static long rings = 0;
   static char called_number[64] = {'0', '1', '0', '1', '0', '0', '0', '0'};
   char *called_number_ptr = called_number + 8;
-
   int readn = 0;
+
+  ringer.handle();
 
   if (millis() - caller_hook_last_transition > 300)
   {
@@ -119,7 +121,7 @@ void handle_pbx()
       (last_state == WAIT_FOR_DIAL && state != WAIT_FOR_DIAL))
   {
     dialtone_stop();
-    digitalWrite(RINGER_RELAY, LOW);
+    ringer.stop();
     last_tone_change = 0;
   }
 
@@ -145,22 +147,20 @@ void handle_pbx()
       dialtone_stop();
       dialtone_start(1500);
       last_tone_change = millis();
-    }
-    if (millis() - last_ringer_change > 2000)
-    {
-      if (rings == 1)
+      ringer.start(1500, []()
+                   {
+                  rings++;
+   if (rings == 1)
       {
+        delay(10);
         transmit_caller_id(called_number, strlen(called_number));
-      }
-      digitalWrite(RINGER_RELAY, !digitalRead(RINGER_RELAY));
-      last_ringer_change = millis();
-      rings++;
+      } });
     }
   }
 
   if (state == CONNECTED)
   {
-    digitalWrite(RINGER_RELAY, LOW);
+    ringer.stop();
     digitalWrite(CONNECT_RELAY, HIGH);
   }
   else

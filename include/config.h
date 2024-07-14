@@ -15,5 +15,6 @@
 #define RINGER_Q2 (7)
 #define RINGER_Q3 (8)
 #define RINGER_Q4 (9)
+#define RINGER_FREQUENCY (20)
 
 #endif
