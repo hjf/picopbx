@@ -4,7 +4,7 @@
 // #include "callerid.h"
 #include "ringer.h"
 #include "config.h"
-Ringer mringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_Q4, RINGER_RELAY, RINGER_FREQUENCY);
+Ringer mringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
 
 void setup()
 {

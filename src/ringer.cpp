@@ -1,16 +1,19 @@
 #include <Arduino.h>
 #include "ringer.h"
 
-Ringer::Ringer(int q1, int q2, int q3, int q4, int relay, int freq)
+Ringer::Ringer(int a1, int a2, int en, int relay, int freq)
 {
-    _q1 = q1;
-    _q2 = q2;
-    _q3 = q3;
-    _q4 = q4;
+    _a1 = a1;
+    _a2 = a2;
+    _en = en;
     _relay = relay;
     period = 1000 / freq;
     digitalWrite(_relay, 0);
     pinMode(_relay, OUTPUT);
+    pinMode(_a1, OUTPUT);
+    pinMode(_a2, OUTPUT);
+    pinMode(_en, OUTPUT);
+    set_coasting();
 }
 
 void Ringer::handle()
@@ -57,32 +60,21 @@ void Ringer::stop()
 
 void Ringer::set_forward()
 {
-    pinMode(_q1, INPUT);
-    pinMode(_q2, INPUT);
-    pinMode(_q3, INPUT);
-    pinMode(_q4, INPUT);
-    digitalWrite(_q2, 0);
-    digitalWrite(_q3, 1);
-    pinMode(_q2, OUTPUT);
-    pinMode(_q3, OUTPUT);
+    digitalWrite(_a1, 1);
+    digitalWrite(_a2, 0);
+    digitalWrite(_en, 1);
 }
 
 void Ringer::set_reverse()
 {
-    pinMode(_q1, INPUT);
-    pinMode(_q2, INPUT);
-    pinMode(_q3, INPUT);
-    pinMode(_q4, INPUT);
-    digitalWrite(_q1, 1);
-    digitalWrite(_q4, 0);
-    pinMode(_q1, OUTPUT);
-    pinMode(_q4, OUTPUT);
+    digitalWrite(_a1, 0);
+    digitalWrite(_a2, 1);
+    digitalWrite(_en, 1);
 }
 
 void Ringer::set_coasting()
 {
-    pinMode(_q1, INPUT);
-    pinMode(_q2, INPUT);
-    pinMode(_q3, INPUT);
-    pinMode(_q4, INPUT);
+    digitalWrite(_en, 0);
+    digitalWrite(_a1, 0);
+    digitalWrite(_a2, 0);
 }

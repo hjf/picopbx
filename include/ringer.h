@@ -4,7 +4,7 @@
 class Ringer
 {
 private:
-    int _q1, _q2, _q3, _q4, _relay;
+    int _a1, _a2, _en, _relay;
     unsigned int last_change = 0;
     unsigned int stop_at = 0;
     int period = 20;
@@ -17,7 +17,7 @@ private:
     void set_coasting();
 
 public:
-    Ringer(int q1, int q2, int q3, int q4, int ringer_relay, int freq);
+    Ringer(int a1, int a2, int en, int ringer_relay, int freq);
     void start();
     void start(int duration, void (*timeout_callback)(void));
     void stop();

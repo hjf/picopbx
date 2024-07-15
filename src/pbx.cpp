@@ -7,7 +7,7 @@
 #include "dtmf.h"
 #include "ringer.h"
 
-Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_Q4, RINGER_RELAY, RINGER_FREQUENCY);
+Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
 
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
