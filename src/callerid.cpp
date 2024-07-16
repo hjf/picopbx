@@ -8,8 +8,6 @@
 // at 2200baud, 1 bit is 454us
 #define HALF_BIT_TIME_SPACE (227)
 
-CallerId::CallerId() {}
-
 int CallerId::transmit_caller_id(const char *message, size_t length)
 {
     Serial.print("Transmitting Caller ID: ");

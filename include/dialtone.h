@@ -4,8 +4,7 @@
 class Dialtone
 {
 public:
-    Dialtone();
-    ~Dialtone();
+    Dialtone(){};
     void start();
     void start(uint16_t duration);
     void stop();

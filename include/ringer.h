@@ -1,5 +1,6 @@
 #ifndef RINGER_H
 #define RINGER_H
+#include <functional>
 
 class Ringer
 {
@@ -11,15 +12,16 @@ private:
     bool running = false;
     bool forward = true;
     int ring_counter = 0;
-    void (*timeout_callback)(void) = NULL;
+    std::function<void(void)> timeout_callback;
     void set_forward();
     void set_reverse();
     void set_coasting();
 
 public:
+    Ringer(){};
     Ringer(int a1, int a2, int en, int relay, int freq);
     void start();
-    void start(int duration, void (*timeout_callback)(void));
+    void start(int duration, std::function<void()> timeout_callback);
     void stop();
     void handle();
 };

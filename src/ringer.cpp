@@ -34,14 +34,6 @@ void Ringer::handle()
     }
 }
 
-void Ringer::start(int duration, void (*timeout_callback)(void))
-{
-    this->timeout_callback = timeout_callback;
-    stop_at = millis() + duration;
-    digitalWrite(_relay, HIGH);
-    start();
-}
-
 void Ringer::start()
 {
     stop_at = 0;
@@ -49,6 +41,14 @@ void Ringer::start()
     running = true;
     last_change = 0;
     ring_counter = 0;
+}
+
+void Ringer::start(int duration, std::function<void()> timeout_callback)
+{
+    this->timeout_callback = timeout_callback;
+    stop_at = millis() + duration;
+    digitalWrite(_relay, HIGH);
+    start();
 }
 
 void Ringer::stop()

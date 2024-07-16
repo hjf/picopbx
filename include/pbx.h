@@ -3,7 +3,11 @@
 
 #include <Arduino.h>
 #include "ringer.h"
-
+#include "pbx.h"
+#include "config.h"
+#include "dialtone.h"
+#include "callerid.h"
+#include "dtmf.h"
 typedef enum
 {
     UNINITIALIZED,
@@ -18,12 +22,16 @@ class PBX
 {
 public:
     PBX();
+    ~PBX();
     void handle();
     void begin();
     static String state_to_string(State s);
 
 private:
     Ringer ringer;
+    CallerId callerId;
+    Dialtone dialtone;
+    Dtmf dtmf;
     State state = UNINITIALIZED;
     State last_state = UNINITIALIZED;
     unsigned long last_state_change = 0;

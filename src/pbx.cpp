@@ -7,11 +7,6 @@
 #include "dtmf.h"
 #include "ringer.h"
 
-Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
-CallerId callerId = CallerId();
-Dialtone dialtone = Dialtone();
-Dtmf dtmf = Dtmf();
-
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
 
@@ -20,7 +15,13 @@ unsigned long dest_hook_last_transition = 0;
 auto caller_off_hook = false;
 auto dest_off_hook = false;
 void caller_hook_isr();
-
+PBX::PBX()
+{
+  ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
+  callerId = CallerId();
+  dialtone = Dialtone();
+  dtmf = Dtmf();
+}
 void PBX::begin()
 {
   pinMode(HOOK_PIN, INPUT_PULLUP);
@@ -142,10 +143,10 @@ void PBX::handle()
   {
     if (millis() - last_tone_change > 4000)
     {
+      last_tone_change = millis();
       dialtone.stop();
       dialtone.start(1500);
-      last_tone_change = millis();
-      ringer.start(1500, []()
+      ringer.start(1500, [this]()
                    {
                   rings++;
    if (rings == 1)

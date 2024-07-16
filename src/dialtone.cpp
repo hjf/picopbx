@@ -30,7 +30,6 @@ void dialtone_cb()
   }
 }
 
-Dialtone::Dialtone() {}
 void Dialtone::start()
 {
   if (!started)
