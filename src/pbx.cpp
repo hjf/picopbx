@@ -9,10 +9,10 @@
 
 volatile boolean PBX::caller_hook_read = false;
 volatile boolean PBX::dest_hook_read = false;
-unsigned long PBX::caller_hook_last_transition = 0;
-unsigned long PBX::dest_hook_last_transition = 0;
-bool PBX::caller_off_hook = false;
-bool PBX::dest_off_hook = false;
+volatile unsigned long PBX::caller_hook_last_transition = 0;
+volatile unsigned long PBX::dest_hook_last_transition = 0;
+volatile bool PBX::caller_off_hook = false;
+volatile bool PBX::dest_off_hook = false;
 
 PBX::PBX()
 {
@@ -21,6 +21,7 @@ PBX::PBX()
   dialtone = Dialtone();
   dtmf = Dtmf();
 }
+
 void PBX::begin()
 {
   pinMode(HOOK_PIN, INPUT_PULLUP);

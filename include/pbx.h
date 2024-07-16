@@ -42,9 +42,9 @@ private:
     static void dest_hook_isr();
     static volatile boolean caller_hook_read;
     static volatile boolean dest_hook_read;
-    static unsigned long caller_hook_last_transition;
-    static unsigned long dest_hook_last_transition;
-    static bool caller_off_hook;
-    static bool dest_off_hook;
+    static volatile unsigned long caller_hook_last_transition;
+    static volatile unsigned long dest_hook_last_transition;
+    static volatile bool caller_off_hook;
+    static volatile bool dest_off_hook;
 };
 #endif
