@@ -1,5 +1,16 @@
 #include <Arduino.h>
 #include "util.h"
+uint8_t modulo256(char *buffer, int len)
+{
+    uint8_t checksum = 0;
+
+    for (int i = 0; i < len; i++)
+    {
+        checksum += buffer[i];
+    }
+    return (~checksum) + 1;
+}
+
 char findMajority(char arr[], char n)
 {
     int maxCount = 0;

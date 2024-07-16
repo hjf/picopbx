@@ -1,20 +1,13 @@
 #include <Arduino.h>
 #include <ADCInput.h>
-#include <Goertzel.h>
 #include "dtmf.h"
 #include "config.h"
 #include "util.h"
 #include "dialtone.h"
 
-Goertzel X0(1209.0, SAMPLE_RATE);
-Goertzel X1(1336.0, SAMPLE_RATE);
-Goertzel X2(1477.0, SAMPLE_RATE);
-Goertzel Y0(697.0, SAMPLE_RATE);
-Goertzel Y1(770.0, SAMPLE_RATE);
-Goertzel Y2(852.0, SAMPLE_RATE);
-Goertzel Y3(941.0, SAMPLE_RATE);
-ADCInput adc(A0);
-Dtmf::Dtmf() {}
+Dtmf::Dtmf()
+{
+}
 
 void Dtmf::begin()
 {

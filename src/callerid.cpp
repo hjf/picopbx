@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "callerid.h"
 #include "config.h"
+#include "util.h"
 
 #define TX_BUF_LEN (64)
 // at 1200 baud, 1 bit is 833us
@@ -37,17 +38,6 @@ int CallerId::transmit_caller_id(const char *message, size_t length)
 
     pinMode(BELL202_PIN, INPUT);
     return 0;
-}
-
-uint8_t CallerId::modulo256(char *buffer, int len)
-{
-    uint8_t checksum = 0;
-
-    for (int i = 0; i < len; i++)
-    {
-        checksum += buffer[i];
-    }
-    return (~checksum) + 1;
 }
 
 void CallerId::send_bytes(char *message, int length)
