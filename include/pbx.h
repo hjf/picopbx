@@ -2,6 +2,7 @@
 #define PBX_H
 
 #include <Arduino.h>
+#include "ringer.h"
 
 typedef enum
 {
@@ -13,9 +14,21 @@ typedef enum
     CONNECTED
 } State;
 
-String state_to_string(State s);
+class PBX
+{
+public:
+    PBX();
+    void handle();
+    void begin();
+    static String state_to_string(State s);
 
-void handle_pbx();
-void initialize_pbx();
-
+private:
+    Ringer ringer;
+    State state = UNINITIALIZED;
+    State last_state = UNINITIALIZED;
+    unsigned long last_state_change = 0;
+    unsigned long last_tone_change = 0;
+    long rings = 0;
+    char called_number[64] = {'0', '1', '0', '1', '0', '0', '0', '0'};
+};
 #endif

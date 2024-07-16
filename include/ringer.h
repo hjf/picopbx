@@ -17,7 +17,7 @@ private:
     void set_coasting();
 
 public:
-    Ringer(int a1, int a2, int en, int ringer_relay, int freq);
+    Ringer(int a1, int a2, int en, int relay, int freq);
     void start();
     void start(int duration, void (*timeout_callback)(void));
     void stop();

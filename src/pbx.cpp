@@ -19,10 +19,9 @@ unsigned long caller_hook_last_transition = 0;
 unsigned long dest_hook_last_transition = 0;
 auto caller_off_hook = false;
 auto dest_off_hook = false;
-State state = UNINITIALIZED;
 void caller_hook_isr();
 
-void initialize_pbx()
+void PBX::begin()
 {
   pinMode(HOOK_PIN, INPUT_PULLUP);
   pinMode(CALLER_HOOK_PIN, INPUT_PULLUP);
@@ -34,13 +33,8 @@ void initialize_pbx()
   dtmf.begin();
 }
 
-void handle_pbx()
+void PBX::handle()
 {
-  static State last_state = UNINITIALIZED;
-  static unsigned long last_state_change = 0;
-  static unsigned long last_tone_change = 0;
-  static long rings = 0;
-  static char called_number[64] = {'0', '1', '0', '1', '0', '0', '0', '0'};
   char *called_number_ptr = called_number + 8;
   int readn = 0;
 
@@ -198,7 +192,7 @@ void caller_hook_isr()
   }
 }
 
-String state_to_string(State s)
+String PBX::state_to_string(State s)
 {
   switch (s)
   {
