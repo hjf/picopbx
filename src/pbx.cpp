@@ -9,6 +9,8 @@
 
 Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
 CallerId callerId = CallerId();
+Dialtone dialtone = Dialtone();
+Dtmf dtmf = Dtmf();
 
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
@@ -29,6 +31,7 @@ void initialize_pbx()
   pinMode(LED_BUILTIN, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(CALLER_HOOK_PIN), caller_hook_isr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(DEST_HOOK_PIN), caller_hook_isr, CHANGE);
+  dtmf.begin();
 }
 
 void handle_pbx()
@@ -86,7 +89,7 @@ void handle_pbx()
     else
     {
 
-      readn = get_number(called_number_ptr, sizeof(called_number) - 8);
+      readn = dtmf.get_number(called_number_ptr, sizeof(called_number) - 8, dialtone);
       if (readn > 0)
       {
         state = CALLING;
@@ -121,22 +124,22 @@ void handle_pbx()
       (last_state == CALLING && state != CALLING) ||
       (last_state == WAIT_FOR_DIAL && state != WAIT_FOR_DIAL))
   {
-    dialtone_stop();
+    dialtone.stop();
     ringer.stop();
     last_tone_change = 0;
   }
 
   if (state == WAIT_FOR_DIAL && last_state != WAIT_FOR_DIAL)
   {
-    dialtone_start();
+    dialtone.start();
   }
 
   if (state == BUSY)
   {
     if (millis() - last_tone_change > 500)
     {
-      dialtone_stop();
-      dialtone_start(250);
+      dialtone.stop();
+      dialtone.start(250);
       last_tone_change = millis();
     }
   }
@@ -145,8 +148,8 @@ void handle_pbx()
   {
     if (millis() - last_tone_change > 4000)
     {
-      dialtone_stop();
-      dialtone_start(1500);
+      dialtone.stop();
+      dialtone.start(1500);
       last_tone_change = millis();
       ringer.start(1500, []()
                    {

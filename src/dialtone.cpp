@@ -29,8 +29,9 @@ void dialtone_cb()
     }
   }
 }
-bool started = false;
-void dialtone_start()
+
+Dialtone::Dialtone() {}
+void Dialtone::start()
 {
   if (!started)
   {
@@ -41,13 +42,13 @@ void dialtone_start()
   stop_at = 0;
 }
 
-void dialtone_start(uint16_t duration)
+void Dialtone::start(uint16_t duration)
 {
-  dialtone_start();
+  start();
   stop_at = millis() + duration;
 }
 
-void dialtone_stop()
+void Dialtone::stop()
 {
   stop_at = millis();
 }

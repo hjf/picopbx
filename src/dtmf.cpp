@@ -5,6 +5,7 @@
 #include "config.h"
 #include "util.h"
 #include "dialtone.h"
+
 Goertzel X0(1209.0, SAMPLE_RATE);
 Goertzel X1(1336.0, SAMPLE_RATE);
 Goertzel X2(1477.0, SAMPLE_RATE);
@@ -13,34 +14,15 @@ Goertzel Y1(770.0, SAMPLE_RATE);
 Goertzel Y2(852.0, SAMPLE_RATE);
 Goertzel Y3(941.0, SAMPLE_RATE);
 ADCInput adc(A0);
-char get_dtmf();
-char dtmf_majority(char n);
-char dtmf_lut[] = {
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '*',
-    '0',
-    '#',
-    0,
-    0,
-    0,
-    0,
-};
+Dtmf::Dtmf() {}
 
-void dtmf_setup()
+void Dtmf::begin()
 {
     adc.setFrequency(SAMPLE_RATE);
     adc.setBuffers(4, 64);
     adc.begin();
 }
-char get_dtmf()
+char Dtmf::get_dtmf()
 {
     int samples[SAMPLE_SIZE];
     float max_x = -1;
@@ -124,7 +106,7 @@ char get_dtmf()
     return dtmf_lut[n & 0x0f];
 }
 
-char dtmf_majority(char n)
+char Dtmf::dtmf_majority(char n)
 {
     // call get_dtmf 3 times and choose the majority result:
     char dtmf[n];
@@ -136,7 +118,7 @@ char dtmf_majority(char n)
     return findMajority(dtmf, n);
 }
 
-int get_number(char *result, size_t size)
+int Dtmf::get_number(char *result, size_t size, Dialtone &dialtone)
 {
     memset(result, 0, size);
     int i = 0;
@@ -151,7 +133,7 @@ int get_number(char *result, size_t size)
             spccnt--;
         else
         {
-            dialtone_stop();
+            dialtone.stop();
             if (spccnt > 0 && maj != lastchar)
                 result[i++] = maj;
             spccnt = 30;
