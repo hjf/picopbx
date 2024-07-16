@@ -8,6 +8,7 @@
 #include "ringer.h"
 
 Ringer ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
+CallerId callerId = CallerId();
 
 volatile boolean caller_hook_read = false;
 volatile boolean dest_hook_read = false;
@@ -153,7 +154,7 @@ void handle_pbx()
    if (rings == 1)
       {
         delay(10);
-        transmit_caller_id(called_number, strlen(called_number));
+        callerId.transmit_caller_id(called_number, strlen(called_number));
       } });
     }
   }

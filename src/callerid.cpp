@@ -3,12 +3,14 @@
 #include "config.h"
 
 #define TX_BUF_LEN (64)
+// at 1200 baud, 1 bit is 833us
+#define HALF_BIT_TIME_MARK (417)
+// at 2200baud, 1 bit is 454us
+#define HALF_BIT_TIME_SPACE (227)
 
-void send_bytes(char *message, int length);
-inline void send_mark();
-inline void send_space();
+CallerId::CallerId() {}
 
-int transmit_caller_id(const char *message, size_t length)
+int CallerId::transmit_caller_id(const char *message, size_t length)
 {
     Serial.print("Transmitting Caller ID: ");
     if (length > TX_BUF_LEN - 2)
@@ -39,7 +41,7 @@ int transmit_caller_id(const char *message, size_t length)
     return 0;
 }
 
-uint8_t modulo256(char *buffer, int len)
+uint8_t CallerId::modulo256(char *buffer, int len)
 {
     uint8_t checksum = 0;
 
@@ -50,7 +52,7 @@ uint8_t modulo256(char *buffer, int len)
     return (~checksum) + 1;
 }
 
-void send_bytes(char *message, int length)
+void CallerId::send_bytes(char *message, int length)
 {
 
     // first the seizure command, 32 bytes of 0x55
@@ -86,12 +88,7 @@ void send_bytes(char *message, int length)
     send_mark();
 }
 
-// at 1200 baud, 1 bit is 833us
-#define HALF_BIT_TIME_MARK 417
-// at 2200baud, 1 bit is 454us
-#define HALF_BIT_TIME_SPACE 227
-
-inline void send_mark()
+inline void CallerId::send_mark()
 {
     digitalWrite(BELL202_PIN, HIGH);
     delayMicroseconds(HALF_BIT_TIME_MARK);
@@ -99,7 +96,7 @@ inline void send_mark()
     delayMicroseconds(HALF_BIT_TIME_MARK);
 }
 
-inline void send_space()
+inline void CallerId::send_space()
 {
     digitalWrite(BELL202_PIN, HIGH);
     delayMicroseconds(HALF_BIT_TIME_SPACE);
