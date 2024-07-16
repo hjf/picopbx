@@ -20,6 +20,7 @@ void Ringer::handle()
 {
     if (millis() - last_change > period)
     {
+        last_change = millis();
         forward = !forward;
         if (forward)
             set_forward();
@@ -41,6 +42,7 @@ void Ringer::start()
     running = true;
     last_change = 0;
     ring_counter = 0;
+    set_forward();
 }
 
 void Ringer::start(int duration, std::function<void()> timeout_callback)
