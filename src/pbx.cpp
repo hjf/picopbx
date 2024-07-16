@@ -7,14 +7,13 @@
 #include "dtmf.h"
 #include "ringer.h"
 
-volatile boolean caller_hook_read = false;
-volatile boolean dest_hook_read = false;
+volatile boolean PBX::caller_hook_read = false;
+volatile boolean PBX::dest_hook_read = false;
+unsigned long PBX::caller_hook_last_transition = 0;
+unsigned long PBX::dest_hook_last_transition = 0;
+bool PBX::caller_off_hook = false;
+bool PBX::dest_off_hook = false;
 
-unsigned long caller_hook_last_transition = 0;
-unsigned long dest_hook_last_transition = 0;
-auto caller_off_hook = false;
-auto dest_off_hook = false;
-void caller_hook_isr();
 PBX::PBX()
 {
   ringer = Ringer(RINGER_Q1, RINGER_Q2, RINGER_Q3, RINGER_RELAY, RINGER_FREQUENCY);
@@ -29,8 +28,8 @@ void PBX::begin()
   pinMode(DEST_HOOK_PIN, INPUT_PULLUP);
   pinMode(CONNECT_RELAY, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(CALLER_HOOK_PIN), caller_hook_isr, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(DEST_HOOK_PIN), caller_hook_isr, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(CALLER_HOOK_PIN), PBX::caller_hook_isr, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(DEST_HOOK_PIN), PBX::dest_hook_isr, CHANGE);
   dtmf.begin();
 }
 
@@ -177,20 +176,16 @@ void PBX::handle()
   }
 }
 
-void caller_hook_isr()
+void PBX::caller_hook_isr()
 {
-  auto current_caller_hook_read = !digitalRead(CALLER_HOOK_PIN);
-  auto current_dest_hook_read = !digitalRead(DEST_HOOK_PIN);
-  if (current_caller_hook_read != caller_hook_read)
-  {
-    caller_hook_read = current_caller_hook_read;
-    caller_hook_last_transition = millis();
-  }
-  if (current_dest_hook_read != dest_hook_read)
-  {
-    dest_hook_read = current_dest_hook_read;
-    dest_hook_last_transition = millis();
-  }
+  caller_hook_read = !digitalRead(CALLER_HOOK_PIN);
+  caller_hook_last_transition = millis();
+}
+
+void PBX::dest_hook_isr()
+{
+  dest_hook_read = !digitalRead(DEST_HOOK_PIN);
+  dest_hook_last_transition = millis();
 }
 
 String PBX::state_to_string(State s)
