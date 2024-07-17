@@ -26,6 +26,7 @@ public:
     void handle();
     void begin();
     static String state_to_string(State s);
+    static bool is_caller_off_hook();
 
 private:
     Ringer ringer;

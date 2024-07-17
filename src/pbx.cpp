@@ -22,6 +22,11 @@ PBX::PBX()
   dtmf = Dtmf();
 }
 
+bool PBX::is_caller_off_hook()
+{
+  return caller_off_hook;
+}
+
 void PBX::begin()
 {
   pinMode(CALLER_HOOK_PIN, INPUT_PULLUP);
@@ -83,7 +88,7 @@ void PBX::handle()
     else
     {
 
-      readn = dtmf.get_number(called_number_ptr, sizeof(called_number) - 8, dialtone);
+      readn = dtmf.get_number(called_number_ptr, sizeof(called_number) - 8, dialtone, &PBX::is_caller_off_hook);
       if (readn > 0)
       {
         Serial.print("Dialed: ");

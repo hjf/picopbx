@@ -1,3 +1,4 @@
+#include <functional>
 #include <Arduino.h>
 #include <ADCInput.h>
 #include "dtmf.h"
@@ -120,7 +121,7 @@ char Dtmf::dtmf_majority(char n)
     return findMajority(dtmf, n);
 }
 
-int Dtmf::get_number(char *result, size_t size, Dialtone &dialtone)
+int Dtmf::get_number(char *result, size_t size, Dialtone &dialtone, std::function<bool()> should_continue)
 {
     memset(result, 0, size);
     int i = 0;
@@ -129,6 +130,10 @@ int Dtmf::get_number(char *result, size_t size, Dialtone &dialtone)
     static char lastchar;
     while (spccnt)
     {
+        if (should_continue && !should_continue())
+        {
+            return 0;
+        }
         char maj = dtmf_majority(5);
         if (!maj)
         {

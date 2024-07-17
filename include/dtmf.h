@@ -16,7 +16,7 @@ class Dtmf
 public:
     Dtmf();
     void begin();
-    int get_number(char *result, size_t size, Dialtone &dialtone);
+    int get_number(char *result, size_t size, Dialtone &dialtone, std::function<bool()> should_continue);
 
 private:
     char get_dtmf();
