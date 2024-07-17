@@ -7,14 +7,13 @@
 
 PWMAudio pwm(DIALTONE_PIN);
 
-const int16_t *start = (const int16_t *)dialtone_samples;
-const int16_t *p = start;
+volatile int Dialtone::stop_at = 0;
+volatile int Dialtone::count = 0;
 
-int stop_at = 0;
-int count = 0;
-
-void dialtone_cb()
+void Dialtone::dialtone_cb()
 {
+  static const int16_t *start = (const int16_t *)dialtone_samples;
+  static const int16_t *p = start;
   if (stop_at && stop_at < millis())
     return;
 
@@ -34,7 +33,7 @@ void Dialtone::start()
 {
   if (!started)
   {
-    pwm.onTransmit(dialtone_cb);
+    pwm.onTransmit(Dialtone::dialtone_cb);
     started = true;
   }
   pwm.begin(31500);

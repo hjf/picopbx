@@ -10,7 +10,10 @@ public:
     void stop();
 
 private:
+    static void dialtone_cb();
     bool started = false;
+    static volatile int stop_at;
+    static volatile int count;
 };
 
 #endif
