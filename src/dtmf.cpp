@@ -5,6 +5,15 @@
 #include "util.h"
 #include "dialtone.h"
 
+Goertzel X0(1209.0, SAMPLE_RATE);
+Goertzel X1(1336.0, SAMPLE_RATE);
+Goertzel X2(1477.0, SAMPLE_RATE);
+Goertzel Y0(697.0, SAMPLE_RATE);
+Goertzel Y1(770.0, SAMPLE_RATE);
+Goertzel Y2(852.0, SAMPLE_RATE);
+Goertzel Y3(941.0, SAMPLE_RATE);
+ADCInput adc(A0);
+
 Dtmf::Dtmf()
 {
 }
@@ -116,24 +125,33 @@ int Dtmf::get_number(char *result, size_t size, Dialtone &dialtone)
     memset(result, 0, size);
     int i = 0;
     int spccnt = 30;
+    int to = 10;
     static char lastchar;
     while (spccnt)
     {
         char maj = dtmf_majority(5);
         if (!maj)
+        {
+            if (i == 0)
+                return 0;
             continue;
-        if (maj == '_')
-            spccnt--;
+        }
         else
         {
-            dialtone.stop();
-            if (spccnt > 0 && maj != lastchar)
-                result[i++] = maj;
-            spccnt = 30;
+            if (maj == '_')
+                spccnt--;
+            else
+            {
+                dialtone.stop();
+                if (spccnt > 0 && maj != lastchar)
+                    result[i++] = maj;
+                spccnt = 30;
+                to = 100;
+            }
+            lastchar = maj;
+            if (i >= size || spccnt == 0)
+                return i;
         }
-        lastchar = maj;
-        if (i >= size || spccnt == 0)
-            return i;
     }
     return 0;
 }

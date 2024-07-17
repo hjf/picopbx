@@ -21,14 +21,6 @@ public:
 private:
     char get_dtmf();
     char dtmf_majority(char n);
-    Goertzel X0 = Goertzel(1209.0, SAMPLE_RATE);
-    Goertzel X1 = Goertzel(1336.0, SAMPLE_RATE);
-    Goertzel X2 = Goertzel(1477.0, SAMPLE_RATE);
-    Goertzel Y0 = Goertzel(697.0, SAMPLE_RATE);
-    Goertzel Y1 = Goertzel(770.0, SAMPLE_RATE);
-    Goertzel Y2 = Goertzel(852.0, SAMPLE_RATE);
-    Goertzel Y3 = Goertzel(941.0, SAMPLE_RATE);
-    ADCInput adc = ADCInput(A0);
 
     char dtmf_lut[16] = {
         '1',

@@ -24,7 +24,6 @@ PBX::PBX()
 
 void PBX::begin()
 {
-  pinMode(HOOK_PIN, INPUT_PULLUP);
   pinMode(CALLER_HOOK_PIN, INPUT_PULLUP);
   pinMode(DEST_HOOK_PIN, INPUT_PULLUP);
   pinMode(CONNECT_RELAY, OUTPUT);
@@ -87,6 +86,8 @@ void PBX::handle()
       readn = dtmf.get_number(called_number_ptr, sizeof(called_number) - 8, dialtone);
       if (readn > 0)
       {
+        Serial.print("Dialed: ");
+        Serial.println(called_number + 8);
         state = CALLING;
       }
     }
