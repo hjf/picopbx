@@ -5,12 +5,12 @@
 #define CALLER_HOOK_PIN (6)
 #define CONNECT_RELAY (14)
 #define RINGER_RELAY (10)
+#define BELL202_PIN (15)
 
 #define DIALTONE_PIN (13)
 
 #define DIALTONE_VOLUME_DIVIDER (1)
 
-#define BELL202_PIN (18)
 
 #define RINGER_Q1 (9)
 #define RINGER_Q2 (4)

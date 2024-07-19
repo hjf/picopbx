@@ -11,7 +11,6 @@
 
 int CallerId::transmit_caller_id(const CalledNumber *number, int length)
 {
-    Serial.print("Transmitting Caller ID: ");
     if (length > TX_BUF_LEN - 8)
     {
         Serial.println("ERROR Message too long");
@@ -23,7 +22,7 @@ int CallerId::transmit_caller_id(const CalledNumber *number, int length)
     Serial.println(number->number);
     char txbuf[TX_BUF_LEN];
     memset(txbuf, 0, TX_BUF_LEN);
-    memcpy(txbuf + 2, number->number, length);
+    memcpy(txbuf + 2, number, length);
 
     txbuf[0] = 0x04; // message type
     txbuf[1] = length;
@@ -31,6 +30,9 @@ int CallerId::transmit_caller_id(const CalledNumber *number, int length)
     int checksum_position = length + 2;
 
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);
+    Serial.print("Transmitting Caller ID: ");
+    Serial.println(txbuf+2);
+
     delay(1);
     send_bytes(txbuf, checksum_position + 1);
     delay(1);

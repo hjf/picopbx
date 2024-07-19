@@ -15,7 +15,11 @@ void Dialtone::dialtone_cb()
   static const int16_t *start = (const int16_t *)dialtone_samples;
   static const int16_t *p = start;
   if (stop_at && stop_at < millis())
+  {
+    pwm.end();
+    pinMode(DIALTONE_PIN, INPUT);
     return;
+  }
 
   while (pwm.availableForWrite())
   {
@@ -42,6 +46,7 @@ void Dialtone::start()
 
 void Dialtone::start(uint16_t duration)
 {
+  pinMode(DIALTONE_PIN, OUTPUT);
   start();
   stop_at = millis() + duration;
 }
