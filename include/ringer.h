@@ -6,8 +6,9 @@ class Ringer
 {
 private:
     int _a1, _a2, _en, _relay;
-    unsigned int last_change = 0;
-    unsigned int stop_at = 0;
+    volatile unsigned int last_change = 0;
+    volatile unsigned int stop_at = 0;
+    volatile bool stopped = true;
     int period = 20;
     bool running = false;
     bool forward = true;
@@ -20,7 +21,7 @@ private:
 public:
     Ringer(){};
     Ringer(int a1, int a2, int en, int relay, int freq);
-    void start();
+    void start(int duration);
     void start(int duration, std::function<void()> timeout_callback);
     void stop();
     void handle();

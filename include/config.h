@@ -13,7 +13,7 @@
 #define BELL202_PIN (18)
 
 #define RINGER_Q1 (9)
-#define RINGER_Q2 (10)
+#define RINGER_Q2 (4)
 #define RINGER_Q3 (11)
 #define RINGER_Q4 (12)
 #define RINGER_FREQUENCY (20)

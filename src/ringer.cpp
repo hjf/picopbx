@@ -18,6 +18,8 @@ Ringer::Ringer(int a1, int a2, int en, int relay, int freq)
 
 void Ringer::handle()
 {
+    if (stopped)
+        return;
     if (millis() - last_change > period)
     {
         last_change = millis();
@@ -35,26 +37,28 @@ void Ringer::handle()
     }
 }
 
-void Ringer::start()
+void Ringer::start(int duration)
 {
-    stop_at = 0;
+    stop_at = millis() + duration;
     forward = true;
     running = true;
     last_change = 0;
     ring_counter = 0;
+    stopped = false;
     set_forward();
 }
 
 void Ringer::start(int duration, std::function<void()> timeout_callback)
 {
     this->timeout_callback = timeout_callback;
-    stop_at = millis() + duration;
+
     digitalWrite(_relay, HIGH);
-    start();
+    start(duration);
 }
 
 void Ringer::stop()
 {
+    stopped = true;
     set_coasting();
     digitalWrite(_relay, LOW);
     running = false;

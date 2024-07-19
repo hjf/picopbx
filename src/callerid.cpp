@@ -9,10 +9,10 @@
 // at 2200baud, 1 bit is 454us
 #define HALF_BIT_TIME_SPACE (227)
 
-int CallerId::transmit_caller_id(const char *message, size_t length)
+int CallerId::transmit_caller_id(const CalledNumber *number, int length)
 {
     Serial.print("Transmitting Caller ID: ");
-    if (length > TX_BUF_LEN - 2)
+    if (length > TX_BUF_LEN - 8)
     {
         Serial.println("ERROR Message too long");
         return -1;
@@ -20,15 +20,14 @@ int CallerId::transmit_caller_id(const char *message, size_t length)
 
     pinMode(BELL202_PIN, OUTPUT);
     digitalWrite(BELL202_PIN, LOW);
-    Serial.println(message);
+    Serial.println(number->number);
     char txbuf[TX_BUF_LEN];
     memset(txbuf, 0, TX_BUF_LEN);
-    memcpy(txbuf + 2, message, length);
+    memcpy(txbuf + 2, number->number, length);
 
     txbuf[0] = 0x04; // message type
     txbuf[1] = length;
 
-    memcpy(txbuf + 2, message, length);
     int checksum_position = length + 2;
 
     txbuf[checksum_position] = modulo256(txbuf, checksum_position);

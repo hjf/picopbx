@@ -38,7 +38,7 @@ private:
     unsigned long last_state_change = 0;
     unsigned long last_tone_change = 0;
     long rings = 0;
-    char called_number[64] = {'0', '1', '0', '1', '0', '0', '0', '0'};
+    CalledNumber called_number;
     static void caller_hook_isr();
     static void dest_hook_isr();
     static volatile boolean caller_hook_read;

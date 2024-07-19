@@ -3,11 +3,17 @@
 
 #include <Arduino.h>
 
+typedef struct __attribute__((__packed__))
+{
+    char datetime[8];
+    char number[32];
+} CalledNumber;
+
 class CallerId
 {
 public:
     CallerId(){};
-    int transmit_caller_id(const char *message, size_t length);
+    int transmit_caller_id(const CalledNumber *number, int length);
 
 private:
     void send_bytes(char *message, int length);

@@ -20,6 +20,8 @@ PBX::PBX()
   callerId = CallerId();
   dialtone = Dialtone();
   dtmf = Dtmf();
+  const char *datetime = "01010000";
+  memset(called_number.datetime, 0, sizeof(called_number.datetime));
 }
 
 bool PBX::is_caller_off_hook()
@@ -40,7 +42,6 @@ void PBX::begin()
 
 void PBX::handle()
 {
-  char *called_number_ptr = called_number + 8;
   int readn = 0;
 
   ringer.handle();
@@ -66,7 +67,7 @@ void PBX::handle()
     }
     else if (caller_off_hook && !dest_off_hook)
     {
-      memset(called_number, 0, sizeof(called_number));
+      memset(called_number.number, 0, sizeof(called_number.number));
       state = WAIT_FOR_DIAL;
     }
     break;
@@ -88,11 +89,11 @@ void PBX::handle()
     else
     {
 
-      readn = dtmf.get_number(called_number_ptr, sizeof(called_number) - 8, dialtone, &PBX::is_caller_off_hook);
+      readn = dtmf.get_number(called_number.number, sizeof(called_number.number), dialtone, &PBX::is_caller_off_hook);
       if (readn > 0)
       {
         Serial.print("Dialed: ");
-        Serial.println(called_number + 8);
+        Serial.println(called_number.number);
         state = CALLING;
       }
     }
@@ -158,7 +159,7 @@ void PBX::handle()
    if (rings == 1)
       {
         delay(10);
-        callerId.transmit_caller_id(called_number, strlen(called_number));
+        callerId.transmit_caller_id(&called_number, sizeof(called_number.datetime)+strlen(called_number.number));
       } });
     }
   }
